@@ -12,7 +12,7 @@ function App() {
   const [manualLat, setManualLat] = useState("");
   const [manualLng, setManualLng] = useState("");
   const [currentTime, setCurrentTime] = useState(DateTime.local());
-  const [locationName, setLocationName] = useState(""); // ✅ new
+  const [locationName, setLocationName] = useState("");
   const mapRef = useRef(null);
 
   // fetch tide data
@@ -99,7 +99,7 @@ function App() {
       setCoords(parsed);
       initMap(parsed.lat, parsed.lng);
       fetchTideData(parsed.lat, parsed.lng);
-      fetchLocationName(parsed.lat, parsed.lng); // ✅ also fetch name
+      fetchLocationName(parsed.lat, parsed.lng);
     }
 
     if (navigator.geolocation) {
@@ -112,7 +112,7 @@ function App() {
         );
         initMap(latitude, longitude);
         fetchTideData(latitude, longitude);
-        fetchLocationName(latitude, longitude); // ✅ also fetch name
+        fetchLocationName(latitude, longitude);
       });
     }
   }, []);
