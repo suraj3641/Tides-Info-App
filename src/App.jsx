@@ -12,6 +12,7 @@ function App() {
   const [manualLat, setManualLat] = useState("");
   const [manualLng, setManualLng] = useState("");
   const [currentTime, setCurrentTime] = useState(DateTime.local());
+  const [locationName, setLocationName] = useState(""); // ✅ new
   const mapRef = useRef(null);
 
   // fetch tide data
@@ -27,6 +28,27 @@ function App() {
       }
     } catch (err) {
       console.error("Tide fetch error:", err);
+    }
+  };
+
+  // fetch location name (city, state)
+  const fetchLocationName = async (lat, lng) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      const data = await res.json();
+      if (data && data.address) {
+        const city =
+          data.address.city ||
+          data.address.town ||
+          data.address.village ||
+          "";
+        const state = data.address.state || "";
+        setLocationName(`${city}, ${state}`);
+      }
+    } catch (err) {
+      console.error("Location fetch error:", err);
     }
   };
 
@@ -53,6 +75,7 @@ function App() {
     localStorage.setItem("location", JSON.stringify({ lat, lng }));
     initMap(lat, lng);
     fetchTideData(lat, lng);
+    fetchLocationName(lat, lng); // ✅ fetch city/state
   };
 
   const clearLocation = () => {
@@ -76,22 +99,30 @@ function App() {
       setCoords(parsed);
       initMap(parsed.lat, parsed.lng);
       fetchTideData(parsed.lat, parsed.lng);
+      fetchLocationName(parsed.lat, parsed.lng); // ✅ also fetch name
     }
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const { latitude, longitude } = pos.coords;
         setCoords({ lat: latitude, lng: longitude });
-        localStorage.setItem("location", JSON.stringify({ lat: latitude, lng: longitude }));
+        localStorage.setItem(
+          "location",
+          JSON.stringify({ lat: latitude, lng: longitude })
+        );
         initMap(latitude, longitude);
         fetchTideData(latitude, longitude);
+        fetchLocationName(latitude, longitude); // ✅ also fetch name
       });
     }
   }, []);
 
   // countdown
   const getCountdown = (time) => {
-    const diff = DateTime.fromISO(time).diff(currentTime, ["hours", "minutes"]).toObject();
+    const diff = DateTime.fromISO(time).diff(currentTime, [
+      "hours",
+      "minutes",
+    ]).toObject();
     if (diff.hours < 0 || diff.minutes < 0) return "Passed";
     return `${Math.floor(diff.hours)}h ${Math.floor(diff.minutes)}m left`;
   };
@@ -124,7 +155,9 @@ function App() {
         </div>
 
         {/* Current Time */}
-        <div className="clock">⏰ {currentTime.toFormat("ccc, dd LLL • hh:mm:ss a")}</div>
+        <div className="clock">
+          ⏰ {currentTime.toFormat("ccc, dd LLL • hh:mm:ss a")}
+        </div>
 
         {/* Map */}
         <div id="map"></div>
@@ -133,10 +166,8 @@ function App() {
         <div className="card">
           <h2>
             Tides{" "}
-            {coords && (
-              <span className="location">
-                
-              </span>
+            {locationName && (
+              <span className="location">📍 {locationName}</span>
             )}
           </h2>
           <ul>
