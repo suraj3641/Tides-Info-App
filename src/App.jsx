@@ -4,7 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./App.css";
 
-const API_KEY = "2bc7ac89-06a6-403a-9ca5-7fc188088d39";
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 function App() {
   const [tides, setTides] = useState([]);
