@@ -14,14 +14,6 @@ The app uses **WorldTides API** to fetch tide timings and shows them on an inter
 - 🌑 Displays tide height (when available)
 - Responsive dark UI
 
----
-
-## 🛠️ Installation & Setup
-
-1. Clone this repo:
-   ```bash
-   git clone https://github.com/your-username/tides-info-app.git
-   cd tides-info-app
 
 ## Install dependencies:
 npm install
